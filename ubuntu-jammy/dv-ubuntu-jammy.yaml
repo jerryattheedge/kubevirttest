@@ -1,0 +1,17 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: ubuntu-jammy-rootdisk
+  namespace: vms
+spec:
+  source:
+    http:
+      # Canonical releases: Ubuntu Server 22.04 LTS (Jammy) cloud image (QCOW2)
+      url: "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
+  storage:
+    # Adjust size & storageClassName as needed
+    resources:
+      requests:
+        storage: 10Gi
+    accessModes: ["ReadWriteOnce"]
+    volumeMode: Filesystem

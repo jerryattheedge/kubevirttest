@@ -1,0 +1,61 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: ubuntu-jammy
+  namespace: vms
+  labels:
+    app: ubuntu-jammy
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: ubuntu-jammy
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        resources:
+          requests:
+            memory: 2Gi
+        devices:
+          disks:
+            - name: rootdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              masquerade: {}
+        features:
+          acpi: {}
+      networks:
+        - name: default
+          pod: {}
+      # Disks
+      volumes:
+        - name: rootdisk
+          dataVolume:
+            name: ubuntu-jammy-rootdisk
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              hostname: ubuntu-jammy
+              manage_etc_hosts: true
+              users:
+                - name: ubuntu
+                  sudo: ALL=(ALL) NOPASSWD:ALL
+                  groups: users, admin
+                  shell: /bin/bash
+                  lock_passwd: true
+                  ssh_authorized_keys:
+                    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCEXAMPLE_REPLACE_WITH_YOUR_KEY
+              ssh_pwauth: false
+              package_update: true
+              packages:
+                - qemu-guest-agent
+              runcmd:
+                - [ systemctl, enable, --now, qemu-guest-agent ]
