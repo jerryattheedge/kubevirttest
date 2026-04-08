@@ -15,3 +15,9 @@ spec:
         storage: 10Gi
     accessModes: ["ReadWriteOnce"]
     volumeMode: Filesystem
+spec:
+  ignoreDifferences:
+  - group: cdi.kubevirt.io
+    kind: DataVolume
+    jsonPointers:
+    - /spec
